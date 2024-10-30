@@ -3,7 +3,7 @@ name: Generate Barcode PDF
 on:
   push:
     paths:
-      - 'uploads/*.xlsx'  # Trigger workflow when an Excel file is added to 'uploads' folder
+      - 'uploads/*.xlsx'  # Trigger the workflow when an Excel file is added to the uploads folder
 
 jobs:
   generate_pdf:
@@ -18,7 +18,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'  # Specify Python version
+          python-version: '3.x'  # Specify the Python version
 
       # Step 3: Install dependencies
       - name: Install dependencies
@@ -30,11 +30,13 @@ jobs:
         run: |
           python generate_pdf.py
 
-      # Step 5: Commit the generated PDF to the output folder
+      # Step 5: Commit and push the generated PDF to the output folder
       - name: Commit generated PDF
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN1 }}  # Use the TOKEN1 secret securely
         run: |
-          git config --local user.name "github-actions"
-          git config --local user.email "actions@github.com"
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
           git add output/*.pdf
           git commit -m "Generated barcode PDF"
           git push
