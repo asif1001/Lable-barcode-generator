@@ -1,3 +1,5 @@
+# generate_pdf.py
+
 import os
 import pandas as pd
 from barcode import Code128
@@ -20,7 +22,7 @@ def generate_barcode_pdf(input_file, output_pdf):
         barcode.save(barcode_filename)
         
         # Draw text and barcode image on the PDF
-        c.drawString(50, y_position, code_value)  # Text next to the barcode
+        c.drawString(50, y_position, code_value)
         c.drawImage(barcode_filename, 150, y_position - 10, width=150, height=50)
         
         # Move to the next position
@@ -37,6 +39,7 @@ def generate_barcode_pdf(input_file, output_pdf):
     c.save()
 
 if __name__ == "__main__":
+    # Find the uploaded Excel file in the 'uploads' folder
     input_file = next(f for f in os.listdir("uploads") if f.endswith(".xlsx"))
     output_pdf = f"output/{input_file.replace('.xlsx', '.pdf')}"
     os.makedirs("output", exist_ok=True)  # Ensure output folder exists
