@@ -29,11 +29,11 @@
             const fileContent = await fileInput.files[0].arrayBuffer();
             const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileContent)));
 
-            // Construct the API endpoint using your GitHub username
+            // Replace `YOUR_NEW_GITHUB_TOKEN_HERE` with your new, valid GitHub token
             const response = await fetch(`https://api.github.com/repos/asif1001/Lable-barcode-generator/contents/uploads/${fileInput.files[0].name}`, {
                 method: "PUT",
                 headers: {
-                    "Authorization": "token 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",  // Replace with your new GitHub token
+                    "Authorization": "token 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",  // Add your GitHub token here
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
@@ -42,17 +42,17 @@
                 })
             });
 
-            // Log response for debugging
+            // Handle response
             const responseData = await response.json();
             console.log("Response status:", response.status);
             console.log("Response data:", responseData);
 
             if (response.ok) {
-                // Display "File uploaded! Generating barcode PDF..." message
+                // Show success message and check for PDF generation
                 statusMessage.textContent = "File uploaded! Generating barcode PDF...";
                 await checkPDFStatus(statusMessage);
             } else {
-                // Display the error message from GitHub
+                // Show error message if upload failed
                 statusMessage.textContent = `File upload failed: ${responseData.message}`;
             }
         }
@@ -66,6 +66,7 @@
             for (let attempt = 0; attempt < maxAttempts; attempt++) {
                 const response = await fetch(pdfUrl, { method: "HEAD" });
                 if (response.ok) {
+                    // Show link to download the PDF if ready
                     statusMessage.innerHTML = `PDF is ready! <a href="${pdfUrl}" download>Download PDF</a>`;
                     return;
                 }
