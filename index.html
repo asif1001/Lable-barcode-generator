@@ -29,11 +29,11 @@
             const fileContent = await fileInput.files[0].arrayBuffer();
             const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileContent)));
 
-            // Replace with your GitHub token and username
-            const response = await fetch(`https://api.github.com/repos/yourusername/barcode-generator/contents/uploads/${fileInput.files[0].name}`, {
+            // Construct the API endpoint using your GitHub username
+            const response = await fetch(`https://api.github.com/repos/asif1001/Lable-barcode-generator/contents/uploads/${fileInput.files[0].name}`, {
                 method: "PUT",
                 headers: {
-                    "Authorization": "token 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",  // Replace with your GitHub token
+                    "Authorization": "token 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",  // Replace with your actual GitHub token
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
@@ -60,7 +60,7 @@
         // Function to check if the PDF is generated
         async function checkPDFStatus(statusMessage) {
             const pdfFileName = document.getElementById("file").files[0].name.replace(".xlsx", ".pdf");
-            const pdfUrl = `https://github.com/yourusername/barcode-generator/raw/main/output/${pdfFileName}`;
+            const pdfUrl = `https://github.com/asif1001/Lable-barcode-generator/raw/main/output/${pdfFileName}`;
 
             const maxAttempts = 30;
             for (let attempt = 0; attempt < maxAttempts; attempt++) {
