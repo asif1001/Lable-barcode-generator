@@ -6,15 +6,11 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
 def generate_barcode_pdf(input_file, output_pdf):
-    # Read the Excel file
     df = pd.read_excel(input_file)
-    
-    # Create a PDF canvas
     c = canvas.Canvas(output_pdf, pagesize=letter)
     width, height = letter
-    y_position = height - 50  # Start position for entries in the PDF
+    y_position = height - 50
 
-    # Iterate through each row in the DataFrame
     for index, row in df.iterrows():
         code_value = str(row['A'])  # Assuming 'A' is the column name
 
@@ -38,11 +34,9 @@ def generate_barcode_pdf(input_file, output_pdf):
             c.showPage()
             y_position = height - 50
 
-    # Save the PDF file
     c.save()
 
 if __name__ == "__main__":
-    # Find the uploaded Excel file in the 'uploads' folder
     input_file = next(f for f in os.listdir("uploads") if f.endswith(".xlsx"))
     output_pdf = f"output/{input_file.replace('.xlsx', '.pdf')}"
     os.makedirs("output", exist_ok=True)  # Ensure output folder exists
