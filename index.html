@@ -7,27 +7,80 @@
 </head>
 <body>
     <h1>Upload Excel to Generate Barcode PDF</h1>
+    
+    <!-- Form to upload the Excel file -->
     <form id="upload-form" enctype="multipart/form-data">
         <input type="file" id="file" accept=".xlsx" required />
         <button type="button" onclick="uploadFile()">Upload and Generate PDF</button>
     </form>
+    
+    <!-- Div to show the status messages -->
+    <div id="status-message" style="margin-top: 20px; font-weight: bold;"></div>
+
     <script>
         async function uploadFile() {
             const fileInput = document.getElementById("file");
+            const statusMessage = document.getElementById("status-message");
+
+            // Display "Uploading file..." message
+            statusMessage.textContent = "Uploading file...";
+
+            // Prepare the file data for upload
             const formData = new FormData();
             formData.append("file", fileInput.files[0]);
-            await fetch(`https://api.github.com/repos/yourusername/barcode-generator/contents/uploads/${fileInput.files[0].name}`, {
+
+            // Convert the file to base64 (required for GitHub API)
+            const fileContent = await fileInput.files[0].arrayBuffer();
+            const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileContent)));
+
+            // Replace with your GitHub token and username
+            const response = await fetch(`https://api.github.com/repos/yourusername/barcode-generator/contents/uploads/${fileInput.files[0].name}`, {
                 method: "PUT",
                 headers: {
-                    "Authorization": "token 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",
+                    "Authorization": "token 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",  // Replace with your token
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
                     message: "Uploading Excel file",
-                    content: await fileInput.files[0].text()
+                    content: base64Content
                 })
             });
-            alert("File uploaded! Please check back in a few moments for the PDF.");
+
+            // Check if the upload was successful
+            if (response.ok) {
+                // Display "File uploaded! Generating barcode PDF..." message
+                statusMessage.textContent = "File uploaded! Generating barcode PDF...";
+
+                // Wait for a few seconds to allow GitHub Actions to complete the job
+                // You might need to adjust the wait time depending on the complexity
+                await checkPDFStatus(statusMessage);
+            } else {
+                statusMessage.textContent = "File upload failed. Please try again.";
+            }
+        }
+
+        // Function to check if the PDF is generated
+        async function checkPDFStatus(statusMessage) {
+            // Modify the filename to check for (e.g., input filename with .pdf extension)
+            const pdfFileName = document.getElementById("file").files[0].name.replace(".xlsx", ".pdf");
+            const pdfUrl = `https://github.com/yourusername/barcode-generator/raw/main/output/${pdfFileName}`;
+
+            // Poll for the PDF availability every 10 seconds
+            const maxAttempts = 30;  // Adjust max attempts based on expected time
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                const response = await fetch(pdfUrl, { method: "HEAD" });
+                if (response.ok) {
+                    // PDF is ready, update the message and provide the download link
+                    statusMessage.innerHTML = `PDF is ready! <a href="${pdfUrl}" download>Download PDF</a>`;
+                    return;
+                }
+
+                // Wait for 10 seconds before the next check
+                await new Promise(resolve => setTimeout(resolve, 10000));
+            }
+
+            // If PDF is still not ready after max attempts
+            statusMessage.textContent = "PDF generation is taking longer than expected. Please check back later.";
         }
     </script>
 </body>
